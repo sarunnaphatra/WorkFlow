@@ -1,0 +1,21 @@
+@startuml seq-buzzebees-privilege
+title Buzzebees Privilege Redemption
+
+participant "AdaPos+" as POS
+participant "Interface Service" as IF
+participant "Buzzebees API" as BZB
+
+group Privilege Check
+    POS -> IF: Check Privilege (Mobile/Card)
+    IF -> BZB: GET /api/campaign/list
+    BZB --> IF: Campaign List (JSON)
+    IF -> POS: Display Campaigns
+end
+
+group Redeem Code
+    POS -> IF: Redeem (CampaignID)
+    IF -> BZB: POST /api/redeem
+    BZB --> IF: Redeem Code (e.g., BB-1234)
+    IF -> POS: Apply Discount & Print Code
+end
+@enduml

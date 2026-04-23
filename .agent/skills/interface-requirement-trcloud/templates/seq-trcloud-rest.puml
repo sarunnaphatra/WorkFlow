@@ -1,0 +1,20 @@
+@startuml seq-trcloud-rest
+title TRCloud Interface (REST Pattern)
+
+participant "AdaPos+" as POS
+participant "Interface Service" as IF
+participant "TRCloud API" as TR
+
+group Inbound: Product Sync
+    IF -> TR: GET /api/v2/products (Filter: Updated > LastSync)
+    TR --> IF: Product List (JSON)
+    IF -> POS: Update Product Master
+end
+
+group Outbound: Sales Invoice
+    POS -> IF: Send Sales Invoice
+    IF -> TR: POST /api/v2/invoices
+    TR --> IF: 201 Created (Ref ID)
+    IF -> POS: Update Sync Status
+end
+@enduml

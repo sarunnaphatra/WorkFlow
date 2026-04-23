@@ -1,0 +1,23 @@
+@startuml seq-sap-hana-idoc
+title SAP HANA Interface (IDoc Pattern)
+
+participant "AdaPos+" as POS
+participant "Interface Service" as IF
+participant "SAP PO/PI" as PO
+participant "SAP S/4HANA" as SAP
+
+group Inbound: Master Data (WBBDLD)
+    SAP -> PO: Send Assortment List (WBBDLD)
+    note right: Contains Article, Price, Barcode
+    PO -> IF: Transform to JSON
+    IF -> POS: Update Product Master
+end
+
+group Outbound: Sales (WPUBON)
+    POS -> IF: Send Sales Transaction
+    IF -> IF: Map to WPUBON Structure
+    IF -> PO: Send IDoc XML
+    PO -> SAP: Forward IDoc
+    SAP -> SAP: Process IDoc (WPUK)
+end
+@enduml

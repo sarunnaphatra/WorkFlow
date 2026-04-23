@@ -1,0 +1,22 @@
+@startuml seq-primo-redemption
+title Primo CRM Interface (Redemption Flow)
+
+participant "AdaPos Front" as UI
+participant "AdaPos Backend" as API
+participant "Primo API" as CRM
+
+group Burn Points (Redemption)
+    UI -> API: Request Redemption (MemberID, RewardID)
+    API -> CRM: POST /v2/redemption/burn
+    note right: Payload: { "member_id": "...", "points": 100 }
+    
+    alt Success
+        CRM --> API: 200 OK (TransactionID, NewBalance)
+        API -> UI: Confirm Redemption
+        UI -> UI: Print Slip / Apply Discount
+    else Insufficient Points
+        CRM --> API: 400 Bad Request (Error: Not enough points)
+        API -> UI: Show Error Message
+    end
+end
+@enduml

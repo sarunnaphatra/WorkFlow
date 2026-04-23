@@ -1,0 +1,23 @@
+@startuml seq-sap-idoc
+title SAP Interface (IDoc Pattern)
+
+participant "AdaPos+" as POS
+participant "Interface Service" as IF
+participant "SAP PO/PI" as PO
+participant "SAP ECC/S4" as SAP
+
+group Inbound: Master Data (MATMAS)
+    SAP -> PO: Send IDoc (MATMAS05)
+    PO -> IF: Transform to JSON (HTTP Post)
+    IF -> POS: Update Product Master
+    IF --> PO: Ack (200 OK)
+end
+
+group Outbound: Sales (WPUBON)
+    POS -> IF: Send Global Sales (JSON)
+    IF -> IF: Map to IDoc Structure
+    IF -> PO: Send IDoc XML (WPUBON01)
+    PO -> SAP: Forward IDoc
+    SAP -> SAP: Process IDoc (Background)
+end
+@enduml

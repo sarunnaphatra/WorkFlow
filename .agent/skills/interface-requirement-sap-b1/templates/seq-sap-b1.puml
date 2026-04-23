@@ -1,0 +1,21 @@
+@startuml seq-sap-b1-service-layer
+title SAP Business One Interface (Service Layer)
+
+participant "AdaPos+" as POS
+participant "Interface Service" as IF
+participant "SAP B1 Service Layer" as SL
+
+group Inbound: Master Data
+    IF -> SL: GET /Items?$select=ItemCode,ItemName,BarCode
+    SL --> IF: Item List (JSON)
+    IF -> POS: Update Product Master
+end
+
+group Outbound: Sales Invoice
+    POS -> IF: Send Sales Invoice
+    IF -> SL: POST /Invoices
+    note right: Payload: { "CardCode": "C001", "DocDate": "...", "DocumentLines": [...] }
+    SL --> IF: 201 Created (DocEntry)
+    IF -> POS: Update Sync Status
+end
+@enduml

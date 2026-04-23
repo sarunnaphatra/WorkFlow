@@ -1,0 +1,20 @@
+@startuml seq-etax-submission
+title e-Tax Invoice Submission
+
+participant "AdaPos+" as POS
+participant "Interface Service" as IF
+participant "e-Tax Service Provider" as SP
+participant "Revenue Dept (RD)" as RD
+
+group e-Tax Generation
+    POS -> IF: Request e-Tax (TaxInvoice)
+    IF -> IF: Generate XML (RD Schema)
+    IF -> IF: Digitally Sign XML (Certificate)
+    IF -> SP: Submit Signed XML
+    SP -> RD: Forward to RD (Batch/Realtime)
+    SP --> IF: Success (Transaction ID)
+    IF -> IF: Generate PDF/A-3 (Embed XML)
+    IF -> POS: Return PDF URL / Print Data
+    POS -> Customer: Send Email / Print Short Receipt
+end
+@enduml

@@ -1,0 +1,59 @@
+@startuml
+!theme toy
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+title Standard Interface Process Flow
+
+participant "ERP System" as ERP
+participant "POS Headquarter" as POS_HQ
+participant "POS Branch" as POS_Bch
+participant "CRM System" as CRM
+
+group 1. Master Data (End-Day/Schedule)
+    ERP -> POS_HQ : 1.1 Product Master (Item, Barcode, UOM)
+    ERP -> POS_HQ : 1.2 Price List & Promotion
+    ERP -> POS_HQ : 1.3 Customer & Supplier Info
+    POS_HQ --> ERP : Acknowledge Status
+end
+
+group 2. Inventory Management
+    == Inbound (รับเข้า) ==
+    ERP -> POS_Bch :Stock Balance (ถ้ามี)
+    ERP -> POS_Bch : 2.1 Confirm Receive /Transfer In
+    POS_Bch -> ERP  : 2.2 Transfer Request / Transfer Out
+ 
+    == Outbound (ส่งออก/ปรับปรุง) ==
+    POS_Bch -> ERP : 2.3 Adjust Stock / Return to Vendor
+end
+
+group 3. Sales & Finance (End-Day/Real-time)
+    POS_Bch -> POS_HQ : 3.1 Sync Sales Transaction (ABB) + TAX(ถ้ามี)
+    POS_HQ -> ERP : 3.2 Send Sales Invoice (A/R Invoice) + TAX(ถ้ามี)
+    POS_HQ -> ERP : 3.3 Send Credit Note (Return/CN) + TAX(ถ้ามี)
+    POS_HQ -> ERP : 3.4 Send Payment & Reconciliation
+end
+
+group 4. CRM & Loyalty (Real-time API)
+    CRM --> POS_HQ : Member Register(ถ้ามี)
+    CRM --> POS_HQ : Member Update (ถ้ามี)
+    POS_Bch -> CRM : 4.1 Inquiry Member Profile
+    CRM --> POS_Bch : Return Points & Tier
+    POS_Bch -> CRM : 4.2 Earn Points (Sales)
+    POS_Bch -> CRM : 4.3 Burn Points (Redemption)
+    POS_Bch -> CRM : 4.4 Validate Coupon
+    POS_Bch -> CRM : 4.5 Confirm Coupon
+end
+
+note right of ERP
+  **Standard Protocol:**
+  - File: CSV/XML/JSON (SFTP)
+  - API: REST/SOAP
+end note
+
+note right of CRM
+  **Security:**
+  - OAuth 2.0 / API Key
+  - TLS 1.2+
+end note
+
+@enduml

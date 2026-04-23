@@ -1,0 +1,23 @@
+@startuml seq-d365-async
+title D365 Interface (Async Pattern)
+
+participant "AdaPos+" as POS
+participant "Interface Service" as IF
+participant "DMF (Data Mgmt)" as DMF
+participant "D365 F&O" as D365
+
+group Inbound: Master Data (Product)
+    D365 -> DMF: Export Job (ReleasedProductsV2)
+    DMF -> IF: Recurring Integration (File/JSON)
+    IF -> IF: Validate & Transform
+    IF -> POS: Update Product Master
+end
+
+group Outbound: Sales Transaction
+    POS -> IF: Send Sales Transaction (JSON)
+    IF -> IF: Validate Structure
+    IF -> DMF: Upload Package (SalesOrderHeaderV2)
+    DMF -> D365: Import Job (Batch)
+    D365 -> D365: Post Invoice
+end
+@enduml
